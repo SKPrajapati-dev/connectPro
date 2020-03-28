@@ -15,6 +15,8 @@ router.post('/signup', (req, res) => {
     email: req.body.email,
     password: req.body.password
   });
+  User.findOne({ email: newUser.email })
+    .then(user => res.json({ success: false, msg: 'Email Already Exists...Please try a different one.'}));
   User.addUser(newUser, function(err) {
     if(err){
       res.json({success: false, msg:'Failed to register user'});
