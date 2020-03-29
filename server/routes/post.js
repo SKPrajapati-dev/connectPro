@@ -8,6 +8,7 @@ const checkJWT = require('../middlewares/checkJwt');
 const User = require('../models/users');
 const Post = require('../models/post');
 const Like = require('../models/like');
+const Follow = require('../models/follow');
 const Comment = require('../models/comment');
 
 //Multer Constants
@@ -36,6 +37,22 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
+
+//GET Route /post/posts
+//Getting Posts of followed Users
+//Private Access
+router.get('/posts', checkJWT, async (req, res) => {
+  let Posts = {};
+  const followings = await Follow.find({ user: req.decoded.data._id });
+  if(followings){
+    for(var i=0; i< followings.length;i++){
+      Posts[i] = await Post.findOne({ author: followings[i].followed});
+    }
+    res.send(Posts);
+  }else{
+    res.json({ msg: 'You are not following anyone..Follow some users to explore '});
+  }
+});
 
 
 //GET Route /post
