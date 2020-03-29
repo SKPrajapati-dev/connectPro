@@ -9,7 +9,7 @@ const config = require('./config/config');
 const app = express();
 
 //Mongoose Connection
-mongoose.connect(config.database);
+mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true });
 mongoose.connection.on('connected', function(){
   console.log('Connected to Database');
 });

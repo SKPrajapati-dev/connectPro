@@ -1,4 +1,4 @@
 module.exports = {
-  database: 'mongodb://localhost:27017/connectpro',
+  database: 'mongodb+srv://dbUser:Users.DB@mongo@cpcluster-xrgru.mongodb.net/connectProDev?retryWrites=true&w=majority',
   secret: "coNNropshe5j"
 }

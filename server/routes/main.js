@@ -15,13 +15,21 @@ router.post('/signup', (req, res) => {
     email: req.body.email,
     password: req.body.password
   });
-  User.addUser(newUser, function(err) {
-    if(err){
-      res.json({success: false, msg:'Failed to register user'});
-    } else{
-      res.json({success: true, msg:'User Registered Successfully'});
-    }
-  });
+  User.findOne({ email: newUser.email })
+    .then(user => {
+      if(user){
+        res.json({ success: false, msg: 'Email Already Exists...Please try a different one.', user: user});
+      }else{
+        User.addUser(newUser, function(err) {
+          if(err){
+            res.json({success: false, msg:'Failed to register user'});
+          } else{
+            res.json({success: true, msg:'User Registered Successfully'});
+          }
+        });
+      }
+    });
+  
 });
 //Login Route /login
 //Public access
