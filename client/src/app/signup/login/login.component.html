@@ -1,6 +1,7 @@
-<div class="login-box">
+<link rel="stylesheet" type="text/css" src="login.component.css">
+<div class="login-box rc">
   <div class="login-logo">
-    <a href="../../index2.html"><b>connect</b>Pro</a>
+    <a href="../../index2.html" class="box"><b>connect</b>Pro</a>
   </div>
   <!-- /.login-logo -->
   <flash-messages></flash-messages>
@@ -26,7 +27,7 @@
         </div>
         <!-- /.col -->
         <div class="col-xs-4">
-          <button type="button" class="btn btn-primary btn-block btn-flat" (click)="signin()">Sign In</button>
+          <button type="button" class="btn btn-primary" (click)="signin()">Sign In</button>
         </div>
         <!-- /.col -->
       </div>
@@ -34,9 +35,9 @@
 
     <div class="social-auth-links text-center">
       <p>- OR -</p>
-      <a href="#" class="btn btn-block btn-social btn-facebook btn-flat"><i class="fa fa-facebook"></i> Sign in using
+      <a href="#" class="btn btn-block btn-social btn-facebook btn-block"><i class="fa fa-facebook"></i> Sign in using
         Facebook</a>
-      <a href="#" class="btn btn-block btn-social btn-google btn-flat"><i class="fa fa-google-plus"></i> Sign in using
+      <a href="#" class="btn btn-block btn-social btn-google btn-block"><i class="fa fa-google-plus"></i> Sign in using
         Google+</a>
     </div>
     <!-- /.social-auth-links -->
