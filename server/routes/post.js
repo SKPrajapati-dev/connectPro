@@ -38,8 +38,10 @@ const upload = multer({
 });
 
 
-//GET Route /post/posts
+//GET Route 
+//ROUTE: /post/posts
 //Getting Posts of followed Users
+//INPUT: token
 //Private Access
 router.get('/posts', checkJWT, async (req, res) => {
   let Posts = {};
@@ -55,7 +57,9 @@ router.get('/posts', checkJWT, async (req, res) => {
 });
 
 
-//GET Route /post
+//GET Route 
+//ROUTE: /post/myposts
+//INPUT: token
 //Getting Post of Logged in User
 //Private access
 router.get('/myposts', checkJWT, (req, res) => {
@@ -70,7 +74,9 @@ router.get('/myposts', checkJWT, (req, res) => {
     .catch(err => res.status(404).json({ msg: err}));
 });
 
-//POST Route /post/create
+//POST Route 
+//ROUTE: /post/create
+//INPUT: token,  {file:post},{string:caption}
 //Creatig a post
 //Private access
 router.post('/create', checkJWT, upload.single('post'), async (req, res) => {
@@ -84,7 +90,9 @@ router.post('/create', checkJWT, upload.single('post'), async (req, res) => {
     .then(posts => res.send(posts));
 });
 
-//DELETE route /post
+//DELETE route 
+//ROUTE: /post/:post_id
+//INPUT: token, @params: post_id
 //Deleting a post
 //Private Access
 router.delete('/:post_id', checkJWT, async (req, res) => {

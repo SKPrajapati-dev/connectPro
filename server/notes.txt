@@ -1,6 +1,7 @@
 USER schema must have:
  -lastlogintime
  -userlocation
+Making middleware for uploading files and images
 
 
 Sk Prajapati - 5e7f8c2f2a522a29d0cd5894

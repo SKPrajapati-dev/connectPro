@@ -8,8 +8,10 @@ const User = require('../models/users');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 
-//GET request /comment
+//GET request 
+//ROUTE: /comment/:post_id
 //Getting comments and replies of a post
+//INPUT: @params: post_id
 //Public Access
 router.get('/:post_id', (req, res) => {
   Comment.find({ post: req.params.post_id })
@@ -18,8 +20,10 @@ router.get('/:post_id', (req, res) => {
     });
 });
 
-//POST request /comment
+//POST request 
+//ROUTE: /comment
 //Writing a comment from a logged in user
+//INPUT: token, {string: postid},{string:comment}
 //Private Access
 router.post('/', checkJWT, async (req, res) => {
   const commentFields = {};
@@ -31,8 +35,10 @@ router.post('/', checkJWT, async (req, res) => {
     .then(commentedPost => res.send(commentedPost));
 });
 
-//POST request /comment/reply
+//POST request 
+//ROUTE: /comment/reply
 //Replying to a comment
+//INPUT: token, {string: reply}, {string: commentid}
 //Private Access
 router.post('/reply', checkJWT, (req, res) => {
   const replyFields = {};
@@ -49,8 +55,10 @@ router.post('/reply', checkJWT, (req, res) => {
     });
 });
 
-//DELETE request /comment
+//DELETE request 
+//ROUTE: /comment/:comment_id
 //Deleting a comment
+//INPUT: token, @params: comment_id
 //Private Access
 router.delete('/:comment_id', checkJWT, async (req, res) => {
   const loggedUser = req.decoded.data._id;

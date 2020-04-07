@@ -8,6 +8,10 @@ const config = require('../config/config');
 const User = require('../models/users');
 
 //Signup Route /signup
+//INPUT: 
+// (string): name,
+// (string): email,
+// (password): password
 //Public access
 router.post('/signup', (req, res) => {
   let newUser = new User({
@@ -32,6 +36,9 @@ router.post('/signup', (req, res) => {
   
 });
 //Login Route /login
+//INPUT:
+// (string): email,
+// (string): password
 //Public access
 router.post('/login', (req, res) => {
   const email = req.body.email;
@@ -44,24 +51,41 @@ router.post('/login', (req, res) => {
     User.comparePassword(password, user.password, (err, isMatch) => {
       if(err) throw err;
       if(isMatch){
-        const token = jwt.sign({ data: user }, config.secret, {expiresIn: 604800});
-        console.log(user.email);
-        res.json({
-          success: true,
-          token: token,
-          user: {
-            id: user._id,
-            name: user.name,
-            email: user.email
-          }
-        });
+        User.findOneAndUpdate({ email: email }, { isOnline: true },{ new: true })
+          .then(updatedUser => {
+            const token = jwt.sign({ data: updatedUser }, config.secret, {expiresIn: 604800});
+            console.log(user.email);
+            res.json({
+              success: true,
+              token: token,
+              user: {
+                id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                isOnline: updatedUser.isOnline
+              }
+            });
+          });
       }else{
         return res.json({ success: false, msg: 'Wrong Password'});
       }
     });
   });
 });
-
-
+//GET rquest /logout
+//Logout from system
+//INPUT: token
+//Private Access
+router.get('/logout', checkJWT, (req, res) => {
+  const authToken = req.decoded.data._id;
+  User.findOneAndUpdate({ _id: authToken }, { isOnline: false}, {new: true})
+    .then(loggedOutUser => {
+      console.log(loggedOutUser.isOnline);
+      res.json({
+        success: true,
+        msg: 'user Logged Out Successfully'
+      });
+    });
+});
 
 module.exports = router;

@@ -7,8 +7,10 @@ const checkJWT = require('../middlewares/checkJwt');
 const User = require('../models/users');
 const Follow = require('../models/follow');
 
-//GET request /follow
-//Follow a User
+//GET request 
+//ROUTE: /follow/:follower_id
+//Follow a User or Unfollow a User
+//INPUT: token, @params: follower_id
 //Private Access
 router.get('/:follower_id', checkJWT, async (req, res) => {
   const followFields = {
