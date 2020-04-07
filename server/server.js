@@ -4,9 +4,48 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config/config');
+const socketio = require('socket.io');
+const socketJWT = require('socketio-jwt');
+const jwt = require('jsonwebtoken');
 
 // Application Server Constant \\app
 const app = express();
+
+const server = app.listen(3001, function(err){
+  if(err) console.log(err);
+  console.log('Server Started at Port 3001');
+});
+
+//SocketIO middleware
+const io = socketio(server);
+var users = {};
+io.on('connection', (socket) => {
+  //Authenticating the socket connection
+  socket.on('userAuth', (token, callback) => {
+    authToken = token;
+    jwt.verify(token, config.secret, function(err, decoded){
+      if(err){
+        callback(err);
+      }else{
+        socket.userEmail = decoded.data.email;
+        users[socket.userEmail] = socket;
+        callback(decoded);
+      }
+    });
+  });
+  //Send message request from sender 
+  socket.on('sendMsg', (data, callback) => {
+    if(users[data.to]){
+      //Sending the message to specific user via socket
+      users[data.to].emit('getMsg', {msg: data.msg, from: socket.userEmail });
+    }else{
+      callback(false); 
+    }
+  });
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+});
 
 //Mongoose Connection
 mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true });
@@ -25,6 +64,7 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods","GET,POST,PATCH,DELETE,PUT,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Origin, Authorization, X-Requested-With, Content-Type, Accept");
   next();
 });
@@ -46,8 +86,3 @@ app.use('/like', likeRoutes);
 app.use('/comment', commentRoutes);
 app.use('/follow', followRoutes);
 app.use('/message', messageRoutes);
-
-app.listen(3001, function(err){
-  if(err) console.log(err);
-  console.log('Server Started at Port 3001');
-});

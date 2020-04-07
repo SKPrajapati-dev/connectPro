@@ -9,18 +9,26 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent implements OnInit {
   user: any;
-  profile: any;
+  profile = {};
+  conversations:any;
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
     this.user = this.authService.getUser();
     this.authService.getProfileViaToken().subscribe((data: any) => {
       this.profile = data;
-    })
+    });
   }
   logout(){
-    this.authService.logout();
+    this.authService.logout().subscribe((data: any) => {
+      console.log(data);
+    });
     this.router.navigate(['']);
   }
-
+  getConversation(){
+    this.authService.getConversations().subscribe((conversations:any) => {
+      this.conversations = conversations;
+    });
+    console.log(this.conversations);
+  }
 }

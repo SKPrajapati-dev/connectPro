@@ -34,7 +34,9 @@ const upload = multer({
 const Profile = require('../models/profile');
 const User = require('../models/users');
 
-//Profile Route /profile
+//GET request  ROUTE: /profile
+//Getting the profile of the logged in user
+//INPUT: token
 //Private access
 router.get('/', checkJWT, (req, res) => {
   Profile.findOne({ user: req.decoded.data._id})
@@ -48,7 +50,11 @@ router.get('/', checkJWT, (req, res) => {
     .catch(err => res.status(404).json({ msg: 'No profile found'}));
 });
 
-//Profile Post Request for new and updating profile 
+//POST Request for new and updating profile
+//ROUTE: /profile
+//INPUT: token,
+// {string: handle}, {string: company}, { string: website}, {string: location}, {string: bio},{string: status}
+// { string: githubusername},{ string[]: skills (sperated by comma)},{string: youtube},{string: facebook},{string:twitter},{string: linkedin},{string: instagram}, {file: avatar}
 //Private access
 router.post('/', checkJWT, upload.single('avatar'), (req, res) => {
   //Get Fields
@@ -96,7 +102,10 @@ router.post('/', checkJWT, upload.single('avatar'), (req, res) => {
       }
     });
 });
-//Profile Post Request for Adding Experience
+//POST Request for Adding Experience
+//ROUTE: /profile/experience
+//INPUT: token,
+// {string: title},{string: company},{string:location},{Date: from},{Date: to},{string: description},{boolean: current}
 //Private access
 router.post('/experience', checkJWT, (req, res) => {
   Profile.findOne({ user: req.decoded.data._id })
@@ -118,7 +127,11 @@ router.post('/experience', checkJWT, (req, res) => {
 
 });
 
-//Profile Post Request fro Adding Education
+//POST Request fro Adding Education
+//ROUTE: /profile/education
+//INPUT: token,
+//{string:institute},{string:degree},{string:fieldofstudy},{string:location}
+//{string: description},{Date:from},{Date:to},{Boolean:current}
 //private Access
 router.post('/education', checkJWT, (req, res) => {
   Profile.findOne({ user: req.decoded.data._id })
@@ -139,7 +152,9 @@ router.post('/education', checkJWT, (req, res) => {
     });
 });
 
-//Profile DELETE Request to delete experience 
+//DELETE Request to delete experience 
+//ROUTE: /profile/experience/:exp_id
+//INPUT: token, @params: exp_id
 //Private Access
 router.delete('/experience/:exp_id', checkJWT, (req, res) => {
   Profile.findOne({ user: req.decoded.data._id }).then(profile => {
@@ -155,7 +170,9 @@ router.delete('/experience/:exp_id', checkJWT, (req, res) => {
   }).catch(err => res.status(404).json(err));
 });
 
-//Profile DELETE Request to delete education
+//DELETE Request to delete education
+//ROUTE: /profile/education/:edu_id
+//INPUT: token, @params: edu_id
 //Private access
 router.delete('/education/:edu_id', checkJWT, (req, res) => {
   Profile.findOne({ user: req.decoded.data._id }).then(profile => {
@@ -171,7 +188,9 @@ router.delete('/education/:edu_id', checkJWT, (req, res) => {
   }).catch(err => res.json(err));
 });
 
-//Profile Post Request for Updating account details 
+//POST Request for Updating account details 
+//ROUTE: /profile/account
+//INPUT: token, {string:name},{string:email},{string: password}
 //Private access
 router.post('/account', checkJWT, (req, res) => {
   
@@ -196,7 +215,9 @@ router.post('/account', checkJWT, (req, res) => {
 
 });
 
-//Profile Delete request for deleting user and profile
+//DELETE request for deleting user and profile
+//ROUTE: /profile
+//INPUT: token
 //private access
 router.delete('/', checkJWT, (req, res) => {
   Profile.findOneAndRemove({ user: req.decoded.data._id })

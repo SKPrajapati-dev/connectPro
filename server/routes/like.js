@@ -8,8 +8,10 @@ const User = require('../models/users');
 const Post = require('../models/post');
 const Like = require('../models/like');
 
-//POST Route /like
-//Liking/Unliking a post of a user 
+//POST Route 
+//ROUTE: /like
+//Liking/Unliking a post of a user
+//INPUT: token, {string:postid}
 //Private access
 router.post('/', checkJWT, async (req, res) => {
   const likeFields = {};
