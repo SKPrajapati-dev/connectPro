@@ -10,6 +10,7 @@ const Post = require('../models/post');
 const Like = require('../models/like');
 const Follow = require('../models/follow');
 const Comment = require('../models/comment');
+const Profile = require('../models/profile');
 
 //Multer Constants
 const multer = require('multer');
@@ -48,7 +49,7 @@ router.get('/posts', checkJWT, async (req, res) => {
   const followings = await Follow.find({ user: req.decoded.data._id });
   if(followings){
     for(var i=0; i< followings.length;i++){
-      Posts[i] = await Post.findOne({ author: followings[i].followed});
+      Posts[i] = await Post.findOne({ author: followings[i].followed}).populate('comments');
     }
     res.send(Posts);
   }else{
