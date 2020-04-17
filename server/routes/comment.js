@@ -13,6 +13,7 @@ const Comment = require('../models/comment');
 //Public Access
 router.get('/:post_id', (req, res) => {
   Comment.find({ post: req.params.post_id })
+    .populate('author')
     .then(comments => {
       res.send(comments);
     });
@@ -21,7 +22,7 @@ router.get('/:post_id', (req, res) => {
 //POST request /comment
 //Writing a comment from a logged in user
 //Private Access
-router.post('/', checkJWT, async (req, res) => {
+router.post('/comm', checkJWT, async (req, res) => {
   const commentFields = {};
   if(req.body.postid) commentFields.post = req.body.postid;
   if(req.body.comment) commentFields.comment = req.body.comment;

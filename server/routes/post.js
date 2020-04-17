@@ -38,22 +38,22 @@ const upload = multer({
 });
 
 
-//GET Route /post/posts
+//GET Route /post/dashboard
 //Getting Posts of followed Users
 //Private Access
-router.get('/posts', checkJWT, async (req, res) => {
+router.get('/dashboard', checkJWT, async (req, res) => {
   let Posts = {};
   const followings = await Follow.find({ user: req.decoded.data._id });
   if(followings){
     for(var i=0; i< followings.length;i++){
-      Posts[i] = await Post.findOne({ author: followings[i].followed});
+      Posts[i] = await Post.findOne({ author: followings[i].followed})
+        .populate('comments');
     }
     res.send(Posts);
   }else{
     res.json({ msg: 'You are not following anyone..Follow some users to explore '});
   }
 });
-
 
 //GET Route /post
 //Getting Post of Logged in User
