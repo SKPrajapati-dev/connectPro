@@ -1,0 +1,12 @@
+USER schema must have:
+ -lastlogintime
+ -userlocation
+Making middleware for uploading files and images
+
+
+websocket eror-sockjs.js:2998 WebSocket connection to 'ws://localhost:4200/sockjs-node/664/pexokwfs/websocket' failed: WebSocket is closed before the connection is established.
+
+Sk Prajapati - 5e7f8c2f2a522a29d0cd5894
+Darshan Marathe - 5e7f8c4c2a522a29d0cd5895
+nancy Miller - 5e7f7f667e49db27502a43cc
+alex dunphy - 5e7f8c142a522a29d0cd5893

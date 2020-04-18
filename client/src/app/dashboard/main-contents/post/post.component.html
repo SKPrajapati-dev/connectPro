@@ -1,0 +1,75 @@
+<div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
+    <!-- Box Comment -->
+    <div class="box border border-primary ">
+      caption: <input type="text" [(ngModel)]="post.caption" placeholder="enter caption"><br>
+      image: <input (change)="selectImage($event)" type= "file" [(ngModel)]="post.image"><br>
+      <button (click)="postPost()">Submit</button>
+    </div>
+    <div class="box box-widget" *ngFor="let post of posts">
+      <div class="box-header with-border">
+        <div class="user-block">
+          <img class="img-circle" src="{{profile.avatar}}" alt="User Image">
+          <span class="username"><a href="#">{{user.name}}</a></span>
+          <span class="description">Shared publicly - 7:30 PM Today</span>
+        </div>
+        <!-- /.user-block -->
+        <div class="box-tools">
+          <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="Mark as read">
+            <i class="fa fa-circle-o"></i></button>
+          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
+        <!-- /.box-tools -->
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body">
+        <img class="img-responsive pad" src="{{post.value.image}}">
+
+        <p>I took this photo this morning. What do you guys think?</p>
+        <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button>
+        <button (click)="postLike()" type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up" (click)="postLike()"></i> Like</button>
+        <span class="pull-right text-muted">{{post.value.likes.length}} Likes - {{post.value.comments.length}} comments</span>
+      </div>
+      <!-- /.box-body -->
+      <div class="box-footer box-comments">
+        <div class="box-comment">
+          <!-- User image -->
+          
+          <div class="comment-text" *ngFor="let comment of post.value.comments">
+            <img class="img-circle" src={{comment.avatar}} alt="User Image">  
+              <span class="username">
+                  Maria Gonzales
+                  <span class="text-muted pull-right">8:03 PM Today</span>
+                </span><!-- /.username -->
+                {{comment.comment}}<div  *ngIf="comment.author == user.id" class="pull-right"><i (click)="deleteComment(comment._id)" class="fa fa-trash zoom" onmouseover="this.style.color='red'" onmouseleave="this.style.color='black'"></i></div>
+                <div style="margin-left: 20px;">
+                  <div *ngFor="let reply of comment.replies" style="margin-left: 10px; margin-top: 10px;"> <img class="img-circle img-sm" src={{reply.avatar}} alt="User Image">{{reply.reply}}</div>
+                  <div *ngIf="reply.from == user.id" class="pull-right"><i (click)="deleteComment(comment._id)" class="fa fa-trash zoom" onmouseover="this.style.color='red'" onmouseleave="this.style.color='black'"></i></div>
+                  <div style="display:inline-flex"><i class="fa fa-reply"></i></div>
+                  <div style="display: inline-flex;"><input type="text" name="text" [(ngModel)]="reply.text" class="d-inline form-control input-sm" placeholder="Post reply"></div>
+                  <button (click)="postReply(comment._id)" class="pull-right" type="submit" >submit</button>
+                </div>
+
+               
+          </div>
+          <!-- /.comment-text -->
+        </div>
+        <!-- /.box-comment -->
+      </div>
+      <!-- /.box-footer -->
+      <div class="box-footer">
+        <form action="#" method="post">
+          <img class="img-responsive img-circle img-sm" src={{profile.avatar}} alt="Alt Text">
+          <!-- .img-push is used to add margin to elements next to floating images -->
+          <div class="img-push">
+            <input type="text" name="text" [(ngModel)]="comment.text" class="form-control input-sm" placeholder="Post comment">
+            <button (click)="postComment(post.value._id)" type="submit" >submit</button>
+          </div>
+        </form>
+      </div>
+      <!-- /.box-footer -->
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
