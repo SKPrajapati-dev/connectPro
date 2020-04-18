@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
 import { analyzeAndValidateNgModules } from '@angular/compiler';
+import { FlashMessagesService } from 'angular2-flash-messages';
+import { Router } from '@angular/router';
+import { isEmpty } from 'rxjs/operators';
+
 @Component({
   selector: 'app-post',
   templateUrl: './post.component.html',
@@ -18,7 +22,13 @@ export class PostComponent implements OnInit {
   delComment:any;
   post:any;
   image:any;
-  constructor(private authService : AuthService) { }
+
+  constructor(
+    private authService: AuthService, 
+    private flashMessage: FlashMessagesService,
+    private router: Router
+  ) { }
+
 
   ngOnInit() {
     this.likedPost='';
@@ -83,6 +93,7 @@ postReply(commentId){
     text:this.reply.text,
     commentid:commentId
   }
+
   this.authService.postReply(this.reply).subscribe((data:any)=>{})
 }
 

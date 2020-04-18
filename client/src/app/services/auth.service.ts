@@ -1,7 +1,11 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpRequest, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { FnParam } from '@angular/compiler/src/output/output_ast';
+import { Injectable, EventEmitter } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { map } from 'rxjs/operators';
+import * as io from 'socket.io-client';
+import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +13,26 @@ import { FnParam } from '@angular/compiler/src/output/output_ast';
 export class AuthService {
   authToken: any;
   user: any;
+  messageSend:any;
+  private profile = new BehaviorSubject<any>('');
+  castProfile = this.profile.asObservable();
+  private socket;
+  private url = 'http://localhost:3001';
 
-  constructor(private http: HttpClient) { }
+  //Behavior Observable for new incoming messages
+  private newMsg = new BehaviorSubject<any>('');
+  //cast used to access the newMsg from components
+  cast = this.newMsg.asObservable();
+
+  constructor(private http: HttpClient){
+    //Socket connection to server url
+    this.socket = io.connect(this.url);
+    //Socket method for receiving mesages
+    this.socket.on('getMsg', (data) => {
+      this.newMsg.next(data);
+    });
+  }
+
 
   //Register new User
   registerUser(newUser){
@@ -44,7 +66,9 @@ export class AuthService {
     this.loadToken();
     headers.set('Content-Type', 'application/json');
     headers = headers.append('Authorization',  this.authToken);
-    return this.http.get('http://localhost:3001/profile', {headers: headers});
+    let temp = this.http.get('http://localhost:3001/profile', {headers: headers});
+    this.profile.next(temp);
+    return temp;
   }
 
   //Updating Porfile Api Call
@@ -108,10 +132,27 @@ export class AuthService {
   }
   //Logout
   logout(){
+    this.loadToken();
+    let token = this.authToken;
+    let headers = new HttpHeaders();
+    headers.set('Content-Type', 'application/json');
+    headers = headers.append('Authorization', token);
+    this.socket.emit('disconnect', 'disconnected', function(){
+      this.socket.disconnect();
+    });
     this.authToken = null;
     this.user = null;
     localStorage.clear();
+    return this.http.get('http://localhost:3001/logout', { headers: headers});
   }
+  //Authenticating the socket connection with JWT at serverside
+  getSocketAuth(){
+    this.loadToken();
+    this.socket.emit('userAuth', this.authToken, (callback) => {
+      console.log(callback);
+    });  
+  }
+
 
 //Getting Home Page Posts
 getPosts(){
@@ -135,12 +176,39 @@ getComments(postId){
 }
 
 postLike(postId){
-    let headers = new HttpHeaders();
+     let headers = new HttpHeaders();
     this.loadToken();
     headers.set('Content-Type','application/json');
     headers = headers.append('Authorization', this.authToken);
     return this.http.post('http://localhost:3001/like/', postId, { headers: headers } );
 }
+  //Sending message to a specific client
+  socketMessage(socketMsg){
+    const senderMsg = {
+      msg: socketMsg.message,
+      from: this.user.email
+     };
+     //Sending message
+     this.socket.emit('sendMsg', {msg: socketMsg.message, to: socketMsg.receiver }, (callback) => {
+       if(!callback){
+         console.log("User is not online"); 
+       }
+     });
+     //Store message
+    this.sendMessage(socketMsg).subscribe((data: any) => {
+       console.log(data);
+     });
+     return senderMsg;
+  }
+  //API call for storing the sent message
+  sendMessage(sendingMsg){
+    let headers = new HttpHeaders();
+    this.loadToken();
+    headers.set('Content-Type','application/json');
+    headers = headers.append('Authorization', this.authToken);
+    return this.http.post('http://localhost:3001/message', sendingMsg, { headers: headers } );
+  }
+
 
 postDislike(postId){
   let headers = new HttpHeaders();
@@ -186,8 +254,17 @@ createPost(post){
   return this.http.post<any>('http://localhost:3001/post/create', post, { headers: headers } );
 }
 
+
+
+  
+  //Getting the conversations
+  getConversations(){
+    this.loadToken();
+    let headers = new HttpHeaders();
+    headers.set('Content-Type', 'application/json');
+    headers  = headers.append('Authorization', this.authToken);
+    return this.http.get('http://localhost:3001/message/chats', {headers: headers});
+    
+  }
+
 }
-
-
-
-

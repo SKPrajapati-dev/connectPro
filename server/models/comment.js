@@ -15,6 +15,9 @@ const CommentSchema = new Schema(
         from: {
           type: Schema.Types.ObjectId,
           ref: 'User'
+        },
+        avatar: {
+          type: String
         }
       }
     ],
@@ -25,6 +28,9 @@ const CommentSchema = new Schema(
     author: {
       type: Schema.Types.ObjectId,
       ref: 'User'
+    },
+    avatar: {
+      type: String
     }
   },
   {

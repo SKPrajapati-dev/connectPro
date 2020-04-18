@@ -7,37 +7,47 @@ const checkJWT = require('../middlewares/checkJwt');
 const User = require('../models/users');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+const Profile = require('../models/profile');
 
-//GET request /comment
+//GET request 
+//ROUTE: /comment/:post_id
 //Getting comments and replies of a post
+//INPUT: @params: post_id
 //Public Access
 router.get('/:post_id', (req, res) => {
-  Comment.find({ post: req.params.post_id })
     .populate('author')
     .then(comments => {
       res.send(comments);
     });
 });
 
-//POST request /comment
+//POST request 
+//ROUTE: /comment
 //Writing a comment from a logged in user
+//INPUT: token, {string: postid},{string:comment}
 //Private Access
 router.post('/comm', checkJWT, async (req, res) => {
   const commentFields = {};
   if(req.body.postid) commentFields.post = req.body.postid;
   if(req.body.comment) commentFields.comment = req.body.comment;
   commentFields.author = req.decoded.data._id;
+  const avatar = await (await Profile.findOne({ user: commentFields.author}, {avatar:1,_id:0}));
+  commentFields.avatar = avatar.avatar;
   const comment = await new Comment(commentFields).save();
   Post.findOneAndUpdate({ _id: commentFields.post }, { $push: { comments: comment.id }}, { new: true })
-    .then(commentedPost => res.send(commentedPost));
+    .then(commentedPost => res.send(comment));
 });
 
-//POST request /comment/reply
+//POST request 
+//ROUTE: /comment/reply
 //Replying to a comment
+//INPUT: token, {string: reply}, {string: commentid}
 //Private Access
-router.post('/reply', checkJWT, (req, res) => {
+router.post('/reply', checkJWT, async (req, res) => {
   const replyFields = {};
   replyFields.from = req.decoded.data._id;
+  const avatar = await Profile.findOne({ user: replyFields.from},{avatar:1,_id:0});
+  replyFields.avatar = avatar.avatar;
   if(req.body.reply) replyFields.reply = req.body.reply;
   Comment.findOne({ _id: req.body.commentid })
     .then(commentFound => {
@@ -50,8 +60,10 @@ router.post('/reply', checkJWT, (req, res) => {
     });
 });
 
-//DELETE request /comment
+//DELETE request 
+//ROUTE: /comment/:comment_id
 //Deleting a comment
+//INPUT: token, @params: comment_id
 //Private Access
 router.delete('/:comment_id', checkJWT, async (req, res) => {
   const loggedUser = req.decoded.data._id;

@@ -6,14 +6,19 @@ const checkJWT = require('../middlewares/checkJwt');
 //Bringing in the Models
 const User = require('../models/users');
 const Message = require('../models/message');
+const Profile = require('../models/profile');
 
-//POST request /message
+//POST request 
+//ROUTE: /message
+//INPUT: token, {string:receiver (receivers emailid)},{string:message}
 //Sending a Message to the User
 //Private Access
 router.post('/', checkJWT, async (req, res) => {
   const msgFields = {};
   msgFields.sender = req.decoded.data._id;
-  if(req.body.receiver) msgFields.receiver = req.body.receiver;
+  if(req.body.receiver){
+    msgFields.receiver = await User.findOne({ email: req.body.receiver }, {_id:1});
+  }
   if(req.body.message) msgFields.message = req.body.message;
   let newMessage = await new Message(msgFields).save();
   const senderUser = await User.findById(msgFields.sender);
@@ -35,8 +40,10 @@ router.post('/', checkJWT, async (req, res) => {
   res.send(newMessage);
 });
 
-//GET request /message/userchat/:chatUser_id
+//GET request 
+//ROUTE: /message/userchat/:chatUser_id
 //Getting user specific conversations or chats // API for after opening a conversation getting all the messages between two users
+//INPUT: token, @params: chatUser_id
 //Privte Access
 router.get('/userchat/:chatUser_id', checkJWT, async (req, res) => {
   const authUser = req.decoded.data._id;
@@ -60,13 +67,18 @@ router.get('/userchat/:chatUser_id', checkJWT, async (req, res) => {
   res.send(specificMessages);
 });
 
-//GET request /message/chats
+//GET request 
+//ROUTE: /message/chats
 // Get Users with whom AuthUser had conversations //API for getting all the conversations like whatsapp home page
+//INPUT: token
 //Private Access
 router.get('/chats', checkJWT, async (req, res) => {
   const authUser = req.decoded.data._id;
   //Getting users with whom AuthUser had a chat
   const users = await User.findById(authUser).populate('messages','id name isOnline');
+  var usermapped;
+  users.messages.map(a => {usermapped = { id: a.id}});
+  const avatar = await Profile.findOne({ user: usermapped.id}, { avatar:1, _id:0});
   //Getting last messages with whom the authUser had a chat
   const lastMessages = await Message.aggregate([
     {
@@ -93,7 +105,8 @@ router.get('/chats', checkJWT, async (req, res) => {
     const user = {
       id: u.id,
       name: u.name,
-      isOnline: u.isOnline
+      isOnline: u.isOnline,
+      avatar: avatar.avatar
     };
 
     const sender = lastMessages.find(m => u.id === m.sender.toString());
@@ -121,8 +134,10 @@ router.get('/chats', checkJWT, async (req, res) => {
   res.send(sortedConversations);
 });
 
-//POST reuest /message/updateseen/
+//POST reuest 
+//ROUTE: /message/updateseen
 //Request for updating the seen field of ny message
+//INPUT: token, {string: sender},{string: receiver}
 //Private Access
 router.post('/updateseen', async (req, res) =>{
   const sender = req.body.sender;
@@ -145,4 +160,8 @@ router.get('/test/:id', async (req, res) => {
   res.send(okay);
 });
 
+router.post('/test', async(req, res) => {
+  let msg = await User.findOne({ email: req.body.email }, {_id:1});
+  res.send(msg._id);
+});
 module.exports = router;

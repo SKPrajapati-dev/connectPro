@@ -1,6 +1,7 @@
 USER schema must have:
  -lastlogintime
  -userlocation
+Making middleware for uploading files and images
 
 
 websocket eror-sockjs.js:2998 WebSocket connection to 'ws://localhost:4200/sockjs-node/664/pexokwfs/websocket' failed: WebSocket is closed before the connection is established.
