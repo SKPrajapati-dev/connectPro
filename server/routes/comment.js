@@ -15,6 +15,7 @@ const Profile = require('../models/profile');
 //INPUT: @params: post_id
 //Public Access
 router.get('/:post_id', (req, res) => {
+  Comment.find({ post: req.params.post_id })
     .populate('author')
     .then(comments => {
       res.send(comments);
