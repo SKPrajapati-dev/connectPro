@@ -15,8 +15,7 @@ const Profile = require('../models/profile');
 //INPUT: @params: post_id
 //Public Access
 router.get('/:post_id', (req, res) => {
-  Comment.find({ post: req.params.post_id })
-    .populate('author','id name')
+    .populate('author')
     .then(comments => {
       res.send(comments);
     });
@@ -27,7 +26,7 @@ router.get('/:post_id', (req, res) => {
 //Writing a comment from a logged in user
 //INPUT: token, {string: postid},{string:comment}
 //Private Access
-router.post('/', checkJWT, async (req, res) => {
+router.post('/comm', checkJWT, async (req, res) => {
   const commentFields = {};
   if(req.body.postid) commentFields.post = req.body.postid;
   if(req.body.comment) commentFields.comment = req.body.comment;

@@ -1,5 +1,7 @@
+import { HttpClient, HttpHeaders, HttpRequest, HttpParams } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+import { FnParam } from '@angular/compiler/src/output/output_ast';
 import { Injectable, EventEmitter } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { map } from 'rxjs/operators';
 import * as io from 'socket.io-client';
@@ -150,6 +152,36 @@ export class AuthService {
       console.log(callback);
     });  
   }
+
+
+//Getting Home Page Posts
+getPosts(){
+    let headers = new HttpHeaders();
+    this.loadToken();
+    headers.set('Content-Type', 'application/json');
+    headers = headers.append('Authorization',  this.authToken);
+    return this.http.get('http://localhost:3001/post/dashboard', {headers: headers});
+}
+
+//getting comments of a post
+getComments(postId){
+  const id = postId;
+  let headers = new HttpHeaders();
+  this.loadToken();
+  console.log(id);
+  headers.set('Content-Type', 'application/json');
+  headers = headers.append('Authorization',  this.authToken);
+  return this.http.get('http://localhost:3001/comment/'+id, {headers: headers});
+
+}
+
+postLike(postId){
+     let headers = new HttpHeaders();
+    this.loadToken();
+    headers.set('Content-Type','application/json');
+    headers = headers.append('Authorization', this.authToken);
+    return this.http.post('http://localhost:3001/like/', postId, { headers: headers } );
+}
   //Sending message to a specific client
   socketMessage(socketMsg){
     const senderMsg = {
@@ -176,6 +208,54 @@ export class AuthService {
     headers = headers.append('Authorization', this.authToken);
     return this.http.post('http://localhost:3001/message', sendingMsg, { headers: headers } );
   }
+
+
+postDislike(postId){
+  let headers = new HttpHeaders();
+  this.loadToken();
+  headers.set('Content-Type','application/json');
+  headers = headers.append('Authorization', this.authToken);
+  return this.http.post('http://localhost:3001/like/', postId, { headers: headers } );
+}
+
+
+postComment(comment){
+  let headers = new HttpHeaders();
+  this.loadToken();
+  headers.set('Content-Type','application/json');
+  headers = headers.append('Authorization', this.authToken);
+  return this.http.post('http://localhost:3001/comment/comm', comment, { headers: headers } );
+}
+
+
+postReply(rep){
+  let headers = new HttpHeaders();
+  this.loadToken();
+  headers.set('Content-Type','application/json');
+  headers = headers.append('Authorization', this.authToken);
+  return this.http.post('http://localhost:3001/comment/reply', rep, { headers: headers } );
+}
+
+deleteComment(comment_Id){
+  let params = new HttpParams();
+  params=params.set('comment_Id', comment_Id);
+  let headers = new HttpHeaders();
+  this.loadToken();
+  headers.set('Content-Type','application/json');
+  headers = headers.append('Authorization', this.authToken);
+  return this.http.delete('http://localhost:3001/comment/'+comment_Id,{ headers: headers, params : params });
+}
+
+createPost(post){
+  let headers = new HttpHeaders();
+  this.loadToken();
+  headers.set('Content-Type','application/json');
+  headers = headers.append('Authorization', this.authToken);
+  return this.http.post<any>('http://localhost:3001/post/create', post, { headers: headers } );
+}
+
+
+
   
   //Getting the conversations
   getConversations(){

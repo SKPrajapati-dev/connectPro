@@ -44,7 +44,7 @@ const upload = multer({
 //Getting Posts of followed Users
 //INPUT: token
 //Private Access
-router.get('/posts', checkJWT, async (req, res) => {
+router.get('/dashboard', checkJWT, async (req, res) => {
   let Posts = {};
   const followings = await Follow.find({ user: req.decoded.data._id });
   if(followings){
