@@ -13,6 +13,7 @@ const Notification = require('../models/notification');
 //  int: skip- how many notifications to skip
 //  int: limit - how many notifications to limit
 //Private ACCESS
-router.get('getNotification'. checkJWT, (req, res) => {
-
+router.get('getNotification'. checkJWT, async(req, res) => {
+  let notifications = await Notification.find({ user: req.decoded.data._id});
+  res.send(notifications);
 });

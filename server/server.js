@@ -4,9 +4,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config/config');
-const socketio = require('socket.io');
-const socketJWT = require('socketio-jwt');
-const jwt = require('jsonwebtoken');
 
 // Application Server Constant \\app
 const app = express();
@@ -17,35 +14,8 @@ const server = app.listen(3001, function(err){
 });
 
 //SocketIO middleware
-const io = socketio(server);
-var users = {};
-io.on('connection', (socket) => {
-  //Authenticating the socket connection
-  socket.on('userAuth', (token, callback) => {
-    authToken = token;
-    jwt.verify(token, config.secret, function(err, decoded){
-      if(err){
-        callback(err);
-      }else{
-        socket.userEmail = decoded.data.email;
-        users[socket.userEmail] = socket;
-        callback(decoded);
-      }
-    });
-  });
-  //Send message request from sender 
-  socket.on('sendMsg', (data, callback) => {
-    if(users[data.to]){
-      //Sending the message to specific user via socket
-      users[data.to].emit('getMsg', {msg: data.msg, from: socket.userEmail });
-    }else{
-      callback(false); 
-    }
-  });
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
-});
+const socket = require('./middlewares/websocket');
+socket.attach(server);
 
 //Mongoose Connection
 mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true });

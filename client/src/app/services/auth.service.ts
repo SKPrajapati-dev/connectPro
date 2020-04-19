@@ -3,7 +3,6 @@ import { map } from 'rxjs/operators';
 import { FnParam } from '@angular/compiler/src/output/output_ast';
 import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import { map } from 'rxjs/operators';
 import * as io from 'socket.io-client';
 import { analyzeAndValidateNgModules } from '@angular/compiler';
 
@@ -24,12 +23,21 @@ export class AuthService {
   //cast used to access the newMsg from components
   cast = this.newMsg.asObservable();
 
+  //Behavior Observable for new incoming notifications
+  private newNotification = new BehaviorSubject<any>('');
+  //cast used to access the newNotification from components
+  notificationCast = this.newNotification.asObservable();
+
   constructor(private http: HttpClient){
     //Socket connection to server url
     this.socket = io.connect(this.url);
     //Socket method for receiving mesages
     this.socket.on('getMsg', (data) => {
       this.newMsg.next(data);
+    });
+    //Socket method for receiving notifications
+    this.socket.on('receiveNotification', (notification) => {
+      this.newNotification.next(notification);
     });
   }
 
@@ -149,7 +157,10 @@ export class AuthService {
   getSocketAuth(){
     this.loadToken();
     this.socket.emit('userAuth', this.authToken, (callback) => {
-      console.log(callback);
+      if(!callback){
+        this.socket.disconnect();
+        console.log("Socket disconnected because of wrong authentication");
+      }
     });  
   }
 
@@ -267,4 +278,9 @@ createPost(post){
     
   }
 
+  //Notifications
+  requestNotification(data){
+    //requesting to generate notification
+    this.socket.emit('requestNotification', data);
+  }
 }
